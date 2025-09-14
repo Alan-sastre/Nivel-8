@@ -1,0 +1,55 @@
+<svg width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Engranaje defectuoso -->
+  <defs>
+    <radialGradient id="damagedGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#D0D0D0"/>
+      <stop offset="50%" stop-color="#A0A0A0"/>
+      <stop offset="100%" stop-color="#707070"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Sombra -->
+  <ellipse cx="42" cy="75" rx="25" ry="4" fill="#000000" opacity="0.2"/>
+  
+  <!-- Cuerpo principal del engranaje dañado -->
+  <circle cx="40" cy="40" r="28" fill="url(#damagedGradient)" stroke="#606060" stroke-width="1.5"/>
+  
+  <!-- Dientes del engranaje (algunos rotos) -->
+  <g stroke="#606060" stroke-width="1" fill="url(#damagedGradient)">
+    <rect x="38" y="10" width="4" height="6" rx="1"/> <!-- Diente roto -->
+    <rect x="55" y="15" width="6" height="4" rx="1" transform="rotate(45 58 17)"/> <!-- Diente desgastado -->
+    <rect x="65" y="38" width="8" height="4" rx="1"/>
+    <rect x="55" y="61" width="8" height="4" rx="1" transform="rotate(-45 59 63)"/>
+    <rect x="38" y="70" width="4" height="5" rx="1"/> <!-- Diente roto -->
+    <rect x="17" y="61" width="8" height="4" rx="1" transform="rotate(45 21 63)"/>
+    <rect x="7" y="38" width="8" height="4" rx="1"/>
+    <!-- Diente faltante aquí -->
+  </g>
+  
+  <!-- Grietas -->
+  <g stroke="#FF4444" stroke-width="1.5" fill="none" opacity="0.8">
+    <path d="M 25 25 L 35 35 L 30 45" stroke-linecap="round"/>
+    <path d="M 50 20 L 55 30 L 60 25" stroke-linecap="round"/>
+    <path d="M 20 50 L 30 55 L 25 65" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Agujero central desgastado -->
+  <circle cx="40" cy="40" r="9" fill="#404040" stroke="#303030" stroke-width="1"/>
+  
+  <!-- Manchas de óxido -->
+  <g fill="#CC6600" opacity="0.6">
+    <ellipse cx="30" cy="25" rx="3" ry="2" transform="rotate(30 30 25)"/>
+    <ellipse cx="55" cy="50" rx="2" ry="3" transform="rotate(-20 55 50)"/>
+    <ellipse cx="25" cy="60" rx="2" ry="2"/>
+  </g>
+  
+  <!-- Desgaste en lugar de brillo -->
+  <ellipse cx="35" cy="32" rx="6" ry="8" fill="#999999" opacity="0.4"/>
+  
+  <!-- Agujero central más grande por desgaste -->
+  <circle cx="40" cy="40" r="4" fill="#202020"/>
+  
+  <!-- Indicador de error -->
+  <circle cx="65" cy="15" r="6" fill="#FF4444" stroke="#CC0000" stroke-width="1"/>
+  <text x="65" y="18" text-anchor="middle" fill="white" font-size="8" font-weight="bold">!</text>
+</svg>
