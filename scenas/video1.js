@@ -6,18 +6,6 @@ class scenaVideo extends Phaser.Scene {
   preload() {
     // Cargar video con configuración para evitar errores de rango
     this.load.video("introVideo", "assets/video1/video.mp4", "canplay");
-    
-    // Configurar el loader para manejar mejor los videos
-    this.load.crossOrigin = 'anonymous';
-
-    // Agregar manejo de errores para la carga del video
-    this.load.on("loaderror", (file) => {
-      if (file.key === "introVideo") {
-        console.error("Error al cargar el video:", file.url);
-        // Cambiar a la siguiente escena si el video no se puede cargar
-        this.scene.start("scenaFallos");
-      }
-    });
   }
 
   create() {
@@ -40,156 +28,111 @@ class scenaVideo extends Phaser.Scene {
 
     const video = this.add.video(screenWidth / 2, screenHeight / 2, "introVideo");
 
-    // Verificar que el video se haya cargado correctamente
-    if (!video) {
-      console.error("Error: Video no se pudo cargar correctamente");
-      // Cambiar a la siguiente escena si el video no se puede cargar
-      this.scene.start("scenaFallos");
-      return;
+    const videoElement = video.video;
+    if (videoElement) {
+      videoElement.muted = false;
     }
 
-    // Esperar a que el video esté listo antes de acceder a sus propiedades
-    let retryCount = 0;
-    const maxRetries = 50; // Máximo 5 segundos de intentos
+    video.on("play", () => {
+      const videoWidth = videoElement.videoWidth;
+      const videoHeight = videoElement.videoHeight;
 
-    const checkVideoReady = () => {
-      if (video.video) {
-        const videoElement = video.video;
-        videoElement.muted = false;
-        videoElement.volume = 1;
+      if (videoWidth && videoHeight) {
+        const videoAspectRatio = videoWidth / videoHeight;
+        const screenAspectRatio = screenWidth / screenHeight;
 
-        // Continuar con el resto de la configuración
-        setupVideoControls();
-      } else {
-        retryCount++;
-        if (retryCount >= maxRetries) {
-          console.error(
-            "Error: Video no se pudo cargar después de múltiples intentos"
-          );
-          // Cambiar a la siguiente escena si el video no se puede cargar
-          this.scene.start("scenaFallos");
-          return;
+        if (videoAspectRatio > screenAspectRatio) {
+          video.setDisplaySize(screenWidth, screenWidth / videoAspectRatio);
+        } else {
+          video.setDisplaySize(screenHeight * videoAspectRatio, screenHeight);
         }
-        // Reintentar después de un breve delay
-        setTimeout(checkVideoReady, 100);
       }
-    };
+    });
 
-    const setupVideoControls = () => {
-      const videoElement = video.video;
-      
-      // Configurar el elemento de video para evitar errores de rango
-      if (videoElement) {
-        videoElement.preload = 'metadata';
-        videoElement.crossOrigin = 'anonymous';
-      }
+    video.play();
 
-      video.on("play", () => {
-        if (videoElement) {
-          // Configurar el video para que ocupe toda la pantalla completa
-          video.setDisplaySize(screenWidth, screenHeight);
-        }
-      });
+    // --- Barra de volumen interactiva ---
+    const sliderContainer = document.createElement("div");
+    sliderContainer.style.position = "absolute";
+    sliderContainer.style.right = "20px";
+    sliderContainer.style.top = "50%";
+    sliderContainer.style.transform = "translateY(-50%)";
+    sliderContainer.style.zIndex = 1000;
+    sliderContainer.style.background = "rgba(30,30,30,0.85)";
+    sliderContainer.style.borderRadius = "16px";
+    sliderContainer.style.padding = "20px 15px";
+    sliderContainer.style.display = "flex";
+    sliderContainer.style.flexDirection = "column";
+    sliderContainer.style.alignItems = "center";
+    sliderContainer.style.justifyContent = "space-between"; // Pushes label to bottom
+    sliderContainer.style.width = "50px";
+    sliderContainer.style.height = "220px"; // Altura ajustada
+    sliderContainer.style.boxShadow = "0 4px 16px rgba(0,0,0,0.35)";
 
-      video.play();
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = 0;
+    slider.max = 100;
+    slider.value = 100; // Start at max volume (top)
+    slider.style.webkitAppearance = "slider-vertical"; // For WebKit browsers
+    slider.style.writingMode = "vertical-lr"; // Standard property for vertical elements
+    slider.style.transform = "rotate(180deg)"; // Invert the visual direction
+    slider.style.width = "8px"; // This is the thickness
+    slider.style.height = "150px"; // This is the length
+    slider.style.accentColor = "#1abc9c";
+    slider.title = "Volumen general";
+    sliderContainer.appendChild(slider);
 
-      // --- Barra de volumen interactiva ---
-      const sliderContainer = document.createElement("div");
-      sliderContainer.style.position = "absolute";
-      sliderContainer.style.right = "20px";
-      sliderContainer.style.top = "50%";
-      sliderContainer.style.transform = "translateY(-50%)";
-      sliderContainer.style.zIndex = 1000;
-      sliderContainer.style.background = "rgba(30,30,30,0.85)";
-      sliderContainer.style.borderRadius = "16px";
-      sliderContainer.style.padding = "20px 15px";
-      sliderContainer.style.display = "flex";
-      sliderContainer.style.flexDirection = "column";
-      sliderContainer.style.alignItems = "center";
-      sliderContainer.style.justifyContent = "space-between"; // Pushes label to bottom
-      sliderContainer.style.width = "50px";
-      sliderContainer.style.height = "220px"; // Altura ajustada
-      sliderContainer.style.boxShadow = "0 4px 16px rgba(0,0,0,0.35)";
+    const valueLabel = document.createElement("span");
+    valueLabel.innerText = "100";
+    valueLabel.style.fontSize = "1.2em";
+    valueLabel.style.color = "#1abc9c";
+    valueLabel.style.fontWeight = "bold";
+    sliderContainer.appendChild(valueLabel);
 
-      const slider = document.createElement("input");
-      slider.type = "range";
-      slider.min = 0;
-      slider.max = 100;
-      slider.value = 0; // Start at min slider value (which shows as max volume 100)
-      slider.style.writingMode = "vertical-lr"; // Standard property for vertical elements - lr makes 100 at top
-      slider.style.direction = "ltr"; // Left-to-right direction for proper orientation
-      slider.style.width = "8px"; // This is the thickness
-      slider.style.height = "150px"; // This is the length
-      slider.style.accentColor = "#1abc9c";
-      slider.style.background = "linear-gradient(to top, #333 0%, #1abc9c 100%)"; // Mostrar lleno inicialmente
-      slider.title = "Volumen general";
-      sliderContainer.appendChild(slider);
+    document.body.appendChild(sliderContainer);
 
-      const valueLabel = document.createElement("span");
-      valueLabel.innerText = "100"; // Mostrar 100 inicialmente (valor invertido)
-      valueLabel.style.fontSize = "1.2em";
-      valueLabel.style.color = "#1abc9c";
-      valueLabel.style.fontWeight = "bold";
-      sliderContainer.appendChild(valueLabel);
+    // Acceso al MusicManager
+    let musicManager = null;
+    if (
+      window.MusicManager &&
+      typeof window.MusicManager.getInstance === "function"
+    ) {
+      musicManager = window.MusicManager.getInstance();
+    } else if (
+      typeof MusicManager !== "undefined" &&
+      typeof MusicManager.getInstance === "function"
+    ) {
+      musicManager = MusicManager.getInstance();
+    }
 
-      document.body.appendChild(sliderContainer);
+    // Inicializar volumen
+    videoElement.volume = 1;
+    if (musicManager && musicManager.music) {
+      musicManager.music.setVolume(0.15); // Ambiente bajo desde el inicio
+    }
 
-      // Acceso al MusicManager
-      let musicManager = null;
-      if (
-        window.MusicManager &&
-        typeof window.MusicManager.getInstance === "function"
-      ) {
-        musicManager = window.MusicManager.getInstance();
-      } else if (
-        typeof MusicManager !== "undefined" &&
-        typeof MusicManager.getInstance === "function"
-      ) {
-        musicManager = MusicManager.getInstance();
-      }
-
-      // Inicializar volumen
-      if (videoElement) {
-        videoElement.volume = 1;
-      }
+    slider.addEventListener("input", function () {
+      const vol = slider.value / 100;
+      videoElement.volume = vol;
+      videoElement.muted = vol === 0;
+      valueLabel.innerText = slider.value;
       if (musicManager && musicManager.music) {
-        musicManager.music.setVolume(0.15); // Ambiente bajo desde el inicio
+        musicManager.music.setVolume(vol * 0.15);
       }
+    });
 
-      slider.addEventListener("input", function () {
-        // Invertir el valor para que 100 esté arriba y 0 abajo
-        const invertedValue = 100 - slider.value;
-        const vol = invertedValue / 100;
-        
-        // Actualizar el background del slider dinámicamente
-        const fillPercentage = invertedValue;
-        slider.style.background = `linear-gradient(to top, #333 ${100-fillPercentage}%, #1abc9c ${100-fillPercentage}%, #1abc9c 100%)`;
-        
-        if (videoElement) {
-          videoElement.volume = vol;
-          videoElement.muted = vol === 0;
-        }
-        valueLabel.innerText = invertedValue;
-        if (musicManager && musicManager.music) {
-          musicManager.music.setVolume(vol * 0.15);
-        }
-      });
-
-      video.on("complete", () => {
-        // Reanudar la música antes de cambiar de escena
-        if (audioManager) {
-          audioManager.resumeMusic();
-        }
-        if (sliderContainer && sliderContainer.parentNode) {
-          sliderContainer.parentNode.removeChild(sliderContainer);
-        }
-        this.scene.start("scenaFallos");
-      });
-    };
-
-    // Iniciar la verificación del video
-    checkVideoReady();
+    video.on("complete", () => {
+      // Reanudar la música antes de cambiar de escena
+      if (audioManager) {
+        audioManager.resumeMusic();
+      }
+      if (sliderContainer && sliderContainer.parentNode) {
+        sliderContainer.parentNode.removeChild(sliderContainer);
+      }
+      this.scene.start("scenaFallos");
+    });
   }
 }
 
-window.scenaVideo = scenaVideo;
+window.scenaVideo1 = scenaVideo1;
