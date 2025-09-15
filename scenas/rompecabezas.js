@@ -8,7 +8,7 @@ class Rompecabezas extends Phaser.Scene {
     this.piecesFixed = 0;
     this.requiredErrors = 4;
     this.requiredFixes = 2;
-    this.targetScore = 300; // Puntuación objetivo para pasar de nivel
+    this.targetScore = 500; // Puntuación objetivo para pasar de nivel
     this.levelPassed = false;
     this.gameWon = false;
     this.gameLost = false;
@@ -284,10 +284,6 @@ class Rompecabezas extends Phaser.Scene {
         title: '3️⃣ REPARAR',
         text: 'Haz clic en las piezas defectuosas\ndetectadas para repararlas'
       },
-      {
-        title: '4️⃣ OBJETIVO',
-        text: 'Detecta 4 errores y repara 2 piezas\ncon 1 sensor'
-      }
     ];
 
     const startY = this.screenHeight * 0.37; // Posición inicial ajustada
