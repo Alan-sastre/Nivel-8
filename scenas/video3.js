@@ -126,4 +126,4 @@ class scenaVideo3 extends Phaser.Scene {
   }
 }
 
-window.scenaVideo = scenaVideo;
+window.scenaVideo3 = scenaVideo3;

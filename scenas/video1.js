@@ -38,11 +38,7 @@ class scenaVideo extends Phaser.Scene {
       0x000000
     );
 
-    const video = this.add.video(
-      screenWidth / 2,
-      screenHeight / 2,
-      "introVideo"
-    );
+    const video = this.add.video(screenWidth / 2, screenHeight / 2, "introVideo");
 
     // Verificar que el video se haya cargado correctamente
     if (!video) {
@@ -119,18 +115,18 @@ class scenaVideo extends Phaser.Scene {
       slider.type = "range";
       slider.min = 0;
       slider.max = 100;
-      slider.value = 100; // Start at max volume (top)
-      slider.style.writingMode = "vertical-lr"; // Standard property for vertical elements
-      slider.style.direction = "rtl"; // Right-to-left direction for proper orientation
-      slider.style.transform = "rotate(180deg)"; // Invert the visual direction
+      slider.value = 0; // Start at min slider value (which shows as max volume 100)
+      slider.style.writingMode = "vertical-lr"; // Standard property for vertical elements - lr makes 100 at top
+      slider.style.direction = "ltr"; // Left-to-right direction for proper orientation
       slider.style.width = "8px"; // This is the thickness
       slider.style.height = "150px"; // This is the length
       slider.style.accentColor = "#1abc9c";
+      slider.style.background = "linear-gradient(to top, #333 0%, #1abc9c 100%)"; // Mostrar lleno inicialmente
       slider.title = "Volumen general";
       sliderContainer.appendChild(slider);
 
       const valueLabel = document.createElement("span");
-      valueLabel.innerText = "100";
+      valueLabel.innerText = "100"; // Mostrar 100 inicialmente (valor invertido)
       valueLabel.style.fontSize = "1.2em";
       valueLabel.style.color = "#1abc9c";
       valueLabel.style.fontWeight = "bold";
@@ -161,12 +157,19 @@ class scenaVideo extends Phaser.Scene {
       }
 
       slider.addEventListener("input", function () {
-        const vol = slider.value / 100;
+        // Invertir el valor para que 100 esté arriba y 0 abajo
+        const invertedValue = 100 - slider.value;
+        const vol = invertedValue / 100;
+        
+        // Actualizar el background del slider dinámicamente
+        const fillPercentage = invertedValue;
+        slider.style.background = `linear-gradient(to top, #333 ${100-fillPercentage}%, #1abc9c ${100-fillPercentage}%, #1abc9c 100%)`;
+        
         if (videoElement) {
           videoElement.volume = vol;
           videoElement.muted = vol === 0;
         }
-        valueLabel.innerText = slider.value;
+        valueLabel.innerText = invertedValue;
         if (musicManager && musicManager.music) {
           musicManager.music.setVolume(vol * 0.15);
         }
